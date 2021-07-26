@@ -1,0 +1,129 @@
+@import '../../styles/variables';
+
+.post{
+    width:100%;
+    border-radius: $radius;
+    -webkit-box-shadow: 0px 0px 16px -8px rgba(0, 0, 0, 0.68);
+    box-shadow: 0px 0px 16px -8px rgba(0, 0, 0, 0.68);
+    margin: 1rem 0;
+}
+
+.postWrapper{
+    padding:.7rem;
+}
+
+.postTop{
+    display:flex;
+    align-items: center;
+    justify-content:space-between;
+}
+
+.postTopLeft{
+    display:flex;
+    align-items: center;
+    flex-flow:row nowrap;
+    
+
+.postProfileImg{
+    max-width: 7vmin;
+    max-height: 7vmin;
+    border-radius:50%;
+    object-fit: cover;
+}
+
+.postuserUsername{
+    font-size:1rem;
+    color:rgb(49, 49, 49);
+    font-weight: 500;
+    margin:0 .8rem;
+}
+
+}
+
+.postTopRight{
+    color:rgb(88, 88, 88);
+    display: flex;
+    align-items: center;
+
+    .postDate{
+    font-size: .9rem;
+    margin-right: .5rem;
+    font-style: italic;
+    }
+}
+
+.postTitle{
+    display:flex;
+    justify-content:space-between;
+
+    & span {
+    color:$clr-primary-1;
+    font-weight: 400;
+    font-size: .9rem;
+    margin:.3rem .2rem;
+}
+
+}
+
+.place {
+    color:$clr-primary-4;
+    font-weight: 800;
+    font-size: 1rem;
+    margin:.2rem .2rem;
+}
+
+
+.postTitleName{
+    display:flex;
+    justify-content:space-between;
+    color:$clr-grey-4;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin:.4rem .2rem;
+    
+}
+
+
+.postCenter{
+    margin:1.5rem 0.3rem;
+    color:$clr-grey-1;
+    font-weight: 500;
+}
+
+.postImg{
+    margin-top: .7rem;
+    width: 100%;
+    max-height: 50vmin;
+    object-fit: cover;
+}
+
+.postButton{
+    display:flex;
+    align-items: center;
+    padding:.5rem .3rem;
+    border-top: 1px solid lightgrey;
+}
+
+.postButtonLeft{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    margin-right: 2rem;
+
+
+.likeIcon{
+    font-size:1.4rem;
+    cursor: pointer;
+    margin-right: .5rem;
+}
+.postlikeCounter{
+    font-size: 1rem;
+    color:rgb(43, 40, 40);
+}
+}
+
+.postCommentText{
+    cursor: pointer;
+    font-size: 1rem;
+    color:rgb(43, 40, 40);
+}
