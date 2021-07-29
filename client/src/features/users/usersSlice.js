@@ -1,19 +1,33 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const initialState = [
-  { id: '0', name: 'AGBU' },
-  { id: '1', name: 'GrantQuickStart' },
-  { id: '2', name: 'Codics' },
-  { id: '3', name: 'ServiceTitan' },
-  { id: '4', name: 'Picsart' },
-  { id: '5', name: 'Preezma' },
-  { id: '6', name: 'AOByte' },
-]
+const initialState = {
+  user: {},
+  isLoading: false,
+  error: '',
+}
+
 
 const usersSlice = createSlice({
   name: 'users',
   initialState,
-  reducers: {},
-})
+  reducers: {
+    getUserPending: (state) => {
+      state.isLoading = true;
+    },
+    getUserSuccess: (state, { payload }) => {
+      state.user = payload;
+      state.isLoading = false;
+      state.error = '';
+    },
+    getUserFail: (state, { payload }) => {
+      state.isLoading = false;
+      state.error = payload;
+    },
+  },
+});
 
-export default usersSlice.reducer
+const { reducer, actions } = usersSlice;
+
+export const { getUserPending, getUserSuccess, getUserFail } = actions;
+
+export default reducer;

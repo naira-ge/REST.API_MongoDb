@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
-import styles from './styles.module.scss';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { handlelogOut } from "../titlePageComponents/actions/index.js";
 import { FaRegImages, FaMapMarkerAlt, FaTags, FaRegSmileWink, FaShare} from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
-
 import { postAdded } from '../../features/posts/postsSlice';
+import styles from './styles.module.scss';
 
 const Share = (props) => { 
     const [file, setFile] = useState('')
@@ -80,18 +76,6 @@ const usersOptions = users.map((user) => (
     )
 }
 
-const mapStateToProps = (state) => {
-    return{
-        loginToHomepage: state.loginToHomepage,
-    }
-} 
 
-const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators(
-        {
-            handlelogOut   
-        },
-        dispatch
-    )
-}
-export default connect(mapStateToProps, mapDispatchToProps)(Share);
+
+export default Share;

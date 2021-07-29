@@ -1,7 +1,4 @@
 import { Link } from 'react-router-dom';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { handlelogOut } from "../titlePageComponents/actions/index.js";
 import { FaSearch,  FaHubspot } from "react-icons/fa";
 import { GoBriefcase, GoTerminal } from "react-icons/go";
 import styles from './styles.module.scss';
@@ -74,12 +71,4 @@ const mapStateToProps = (state) => {
     }
 } 
 
-const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators(
-        {
-            handlelogOut   
-        },
-        dispatch
-    )
-}
-export default connect(mapStateToProps, mapDispatchToProps)(Navbar);
+export default Navbar;

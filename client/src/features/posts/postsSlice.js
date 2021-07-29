@@ -1,82 +1,150 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit'
-import { sub } from 'date-fns'
+import { v1 as uuid } from 'uuid';
+import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = [
-  {
-    id: '1',
-    title: 'Thank you AGBU',
-    content: 'Thank you for your support and help. We love AGBU!',
-    user: '0',
-    date: sub(new Date(), { minutes: 10 }).toISOString(),
-    reactions: {
-      thumbsUp: 0,
-      hooray: 0,
-      heart: 0,
-      rocket: 0,
-      eyes: 0,
+
+const initialState = {
+page: 1, 
+column1: [],
+column2: [],
+posts: [
+    {
+        id: uuid(),
+        desc: "Learn React",
+        isComplete: false,
+        comments: [
+            { comment_id: 1, text: 'Learn React comments 1', rate: 3 },
+            { comment_id: 2, text: 'Learn React comments 2', rate: 5 },
+        ]
     },
-  },
-  {
-    id: '1',
-    title: 'Recommended Quick Start and Great teacher Tatevik!',
-    content: 'Tatevik great teacher ever! Thank you for your professionalism )',
-    user: '2',
-    date: sub(new Date(), { minutes: 5 }).toISOString(),
-    reactions: {
-      thumbsUp: 0,
-      hooray: 0,
-      heart: 0,
-      rocket: 0,
-      eyes: 0,
-    },
-  },
 ]
+};
+
 
 const postsSlice = createSlice({
-  name: 'posts',
-  initialState,
-  reducers: {
-    postAdded: {
-      reducer(state, action) {
-        state.push(action.payload)
-      },
-      prepare(title, content, userId) {
-        return {
-          payload: {
-            id: nanoid(),
-            date: new Date().toISOString(),
-            title,
-            content,
-            user: userId,
-            reactions: {
-              thumbsUp: 0,
-              hooray: 0,
-              heart: 0,
-              rocket: 0,
-              eyes: 0,
+    name:'posts',
+    initialState: initialState,
+    reducers: {
+        createPost: {
+            reducer: (state, {payload}) => {
+                state.posts.push(payload);
             },
-          },
+            prepare: ({ desc }) => ({
+                payload: {
+                    id:uuid(),
+                    desc,
+                    isComplete:false,
+                    comments: "",
+                }
+            }),
+        },
+        createComment: {
+            reducer: (state, {payload}) => {
+                const postComment = state.posts.find(post => post.id === payload.id);
+                
+                if(postComment) {
+                    return state.posts[payload.postIndex].comments.push(payload);
+                }
+            },
+            prepare: ({ text, id, postIndex }) => ({
+                payload: {
+                        comment_id:uuid(),
+                        text, 
+                        rate:1,
+                }
+            }),
+            },
+            edit: (state, action) => {
+                  const postEdit = state.posts.find(post => post.id === action.payload.id);
+                    if(postEdit) {
+                      postEdit.desc = action.payload.desc;
+                    }
+            },
+            toggle: (state, action) => {
+                  const postToggle = state.column1.find(post => post.id === action.payload.id)  
+                  const postToggle2 = state.column2.find(post => post.id === action.payload.id);
+
+            if(postToggle ) {
+                postToggle.isComplete = !postToggle.isComplete;
+                state.posts.push(postToggle);
+            }
+            if(postToggle2 ) {
+                postToggle2.isComplete = !postToggle2.isComplete;
+                state.posts.push(postToggle2);
+            }
+        },
+        columnAdd: (state, action) => {
+            const {id} = action.payload;
+            const postAddColumn = state.posts.pop();
+
+            if(postAddColumn) {
+                postAddColumn.isComplete = !postAddColumn.isComplete;
+                state[id].push(postAddColumn); 
+            }
+        },
+        search: (state, {payload}) => {
+            const searchResult = state.posts.filter(post => {
+                return post.desc.toLowerCase.includes(payload.value) || 
+                post.comments.filter(comment => {
+                    return comment.text.toLowerCase.includes(payload.value)
+                })
+            });
+            
+            return state.posts = searchResult;
+        },
+        filter: (state, action) => {
+            const filterPost = action.payload.direction === "asc" ?
+            sortAsc(state.column1, 'desc') :
+            sortDesc(state.column1, 'desc');
+
+            return filterPost;
+        },
+        setPage: (state, action) => {
+            state.page = action.payload
+        },
+    }
+});
+
+
+//ascending order
+function sortAsc (arr, field) {
+    return arr.sort(function (a, b) {
+        if (a[field] > b[field]) {
+            return 1;
         }
-      },
-    },
-    reactionAdded(state, action) {
-      const { postId, reaction } = action.payload
-      const existingPost = state.find((post) => post.id === postId)
-      if (existingPost) {
-        existingPost.reactions[reaction]++
-      }
-    },
-    postUpdated(state, action) {
-      const { id, title, content } = action.payload
-      const existingPost = state.find((post) => post.id === id)
-      if (existingPost) {
-        existingPost.title = title
-        existingPost.content = content
-      }
-    },
-  },
-})
+        if (b[field]> a[field]) {
+            return -1;
+        }
+        return 0;
+    })
+};
 
-export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions
+//descending order
+function sortDesc (arr, field) {
+    return arr.sort(function (a, b) {
+        if (a[field] > b[field]) {
+            return -1;
+        }
+        if (b[field]> a[field]) {
+            return 1;
+        }
+        return 0;
+    })
+}
 
-export default postsSlice.reducer
+
+export const {
+    createPost: postAdded,  
+    createComment: createCommentActionCreator, 
+    completed:createCompletedActionCreator,
+    notComplete:notCompleteActionCreator,
+    edit: editPostActionCreator,
+    search: filterBySearch,
+    toggle: togglePostActionCreator,
+    filter: filterActionCreator,
+    setPage: setCurrentPage,
+    columnAdd: columnAddActionCreator} = postsSlice.actions;
+
+export const selectPosts = (state) => state.post;
+
+
+export default postsSlice.reducer;

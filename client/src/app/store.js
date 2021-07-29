@@ -1,23 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
-
-import { loginToHomepage } from '../components/titlePageComponents/reducer/login';
-import { popupHandler } from '../components/titlePageComponents/reducer/popupHandler';
 import { jobsCompanyReducer } from '../_reducers/jobCompanyReducer';
-import { usersReducer } from '../_reducers/userReducer';
-
 import postsReducer from '../features/posts/postsSlice';
-import userReducer from '../features/users/usersSlice';
+import usersReducer from '../features/users/usersSlice';
 import loginReducer from '../features/login/loginSlice';
 
+//loginToHomepage: loginToHomepage,
 
- const store = configureStore({
+const store = configureStore({
   reducer: {
-    popupHandler: popupHandler,
-    loginToHomepage: loginToHomepage,
-    login:loginReducer,
-    jobs: jobsCompanyReducer,
+    login: loginReducer,
     users: usersReducer,
-    user: userReducer,
+    jobs: jobsCompanyReducer,
     posts: postsReducer,
   },
 });

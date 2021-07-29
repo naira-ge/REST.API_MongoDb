@@ -2,8 +2,22 @@ const User = require('../models/User');
 const router = require("express").Router();
 const bcrypt = require('bcrypt');
 
+const { userAuthorization } = require("../middlewares/authorization");
+
+// get user profile router
+router.get("/", userAuthorization, async (req, res) => {
+
+    try {
+        const userProf = await User.findById(req.userId);
+        const { password, updateAt, ...other } = user._doc;
+        res.status(200).json(other);
+    } catch(err) {
+        return res.status(500).json(err);
+    }
+});
+
 //update user
-router.put("/:id", async(req, res) => {
+router.patch("/:id", async(req, res) => {
     if(req.body.userId === req.params.id || req.body.isAdmin) {
         if(req.body.password) {
             try {
@@ -49,17 +63,6 @@ router.delete("/:id", async(req, res) => {
     }
 });
 
-//get a user
-router.get("/:id", async(req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        const { password, updateAt, ...other } = user._doc;
-        res.status(200).json(other);
-    } catch(err) {
-        return res.status(500).json(err);
-    }
-});
-
 //get a  user with query
 router.get("/", async(req, res) => {
     const userId = req.query.userId;
@@ -80,7 +83,7 @@ router.get("/", async(req, res) => {
 });
 
 //follow a user
-router.put("/:id/follow", async(req, res) => {
+router.patch("/:id/follow", async(req, res) => {
     if(req.body.userId !== req.params.id) {
         try {
             const user = await User.findById(req.params.id);
@@ -108,7 +111,7 @@ router.put("/:id/follow", async(req, res) => {
 })
 
 //unfollow a user
-router.put("/:id/unfollow", async(req, res) => {
+router.patch("/:id/unfollow", async(req, res) => {
     if(req.body.userId !== req.params.id) {
         try {
             const user = await User.findById(req.params.id);
