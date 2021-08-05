@@ -24,7 +24,7 @@ const Modal = (props) => {
                     style={{ backgroundImage: `url(/gif/logo.gif)` }}>
                     <h3 className={styles.loginLogo}><FaHubspot /> TalentHouse</h3>
                     <span className={styles.loginDesc}>
-                    Connect talented people around the world with the on-demand creative community
+                    Connect talented people around the world 
                     </span>
                 </div>
                 <SignIn onConfirm={confirmHandler}/>

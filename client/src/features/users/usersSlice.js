@@ -1,9 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  user: {},
+  user: {username:"jhon"},
   isLoading: false,
   error: '',
+  updatePending: false,
+  updateError: '',
 }
 
 
@@ -23,11 +25,26 @@ const usersSlice = createSlice({
       state.isLoading = false;
       state.error = payload;
     },
+    getUserUpdateStart: (state) => {
+      state.updatePending = true;
+    },
+    getUserUpdate: (state, { payload }) => {
+      state.updatePending = false;
+      state.user = payload;
+    },
+    getUserUpdateFail: (state, { payload }) => {
+      state.updatePending = false;
+      state.updateError = payload;
+    },
+    getUserRemove: (state, { payload }) => {
+      state.isLoading = false;
+      state.error = payload;
+    },
   },
 });
 
 const { reducer, actions } = usersSlice;
 
-export const { getUserPending, getUserSuccess, getUserFail } = actions;
+export const { getUserPending, getUserSuccess, getUserFail, getUserUpdateStart, getUserUpdate, getUserUpdateFail, getUserRemove } = actions;
 
 export default reducer;

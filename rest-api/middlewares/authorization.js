@@ -2,26 +2,50 @@ const { verifyAccessJWT } = require("../helpers/jwt");
 const { getJWT, deleteJWT } = require("../helpers/redis");
 
 const userAuthorization = async (req, res, next) => {
-    const { authorization } = req.headers;
+  const { authorization } = req.headers;
 
-    const decoded = await verifyAccessJWT(authorization);
+  console.log(authorization);
 
-    if (decoded.email) {
-        const userId = await getJWT(authorization);
-    if (!userId) {
-        return res.status(403).json({ message: "Forbidden" });
+  const decoded = await  jwt.verify(authorization, process.env.JWT_ACCESS_SECRET, (err, user) => {
+            if (err) {
+                return res.status(403).json("Token is not valid");
+            }
+            req.user = user;
+            next();
+    });
+
+    console.log(decoded, 'decoded');
+
+    if (!decoded) {
+      return res.status(403).json({ message: "Forbidden" });
     }
 
-    req.userId = userId;
+  decoded = userId;
+  next();
+  
+  };
 
-    return next();
+const verify = (req, res, next) => {
+
+  const authHeader = req.headers.authorization;
+  
+    if (authHeader) {
+        const token = authHeader.split(" ")[1];
+
+        jwt.verify(token, "mySecretKey", (err, user) => {
+            if (err) {
+                return res.status(403).json("Token is not valid");
+          }
+          
+            req.user = user;
+            next();
+        })
+    } else {
+        res.status(401).json("You are not authenticated!")
     }
-
-    deleteJWT(authorization);
-
-    return res.status(403).json({ message: "Forbidden" });
 };
 
 module.exports = {
     userAuthorization,
+    verify
 };

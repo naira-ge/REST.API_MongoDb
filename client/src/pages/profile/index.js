@@ -1,7 +1,11 @@
 import React, {useState, useEffect} from "react";
 import { useParams } from 'react-router';
-
+import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
+
+import { updateUser } from '../../api/usersApi';
+import { getUserUpdateStart, getUserUpdate, getUserUpdateFail, getUserRemove } from '../../features/users/usersSlice';
+
 import Topbar from '../../components/Topbar/index';
 import Navbar from '../../components/Navbar/index';
 import Sidebar from '../../components/Sidebar/index';
@@ -11,9 +15,26 @@ import Footer from '../../components/Footer/index';
 import styles from './styles.module.scss';
 
 export default function UserProfile() {
-  const [user, setUser] = useState({});
+  
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+
   const username = useParams().username;
 
+  const user = useSelector(state => state.users.user);
+  const dispatch = useDispatch();
+
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    updateUser({ name, email }, dispatch());
+  };
+
+  const handleDelete = (e) => {
+    e.preventDefault();
+    dispatch();
+  }
+
+  /*
     useEffect(() => {
         const fetchUser = async () => {
             await axios.get(`http://localhost:8800/api/users?username=${username}`)
@@ -24,9 +45,12 @@ export default function UserProfile() {
             .catch(err => {console.log(err)});
         }
         fetchUser();
-    }, [username]);
-
-
+    }, [username]);*/
+  
+/*<div>
+        <Sidebar />
+        </div>*/
+  
   return (
     <>
     <Navbar />
@@ -35,11 +59,9 @@ export default function UserProfile() {
       <div className={styles.profileRight}>
         <div>
         <Topbar user = {user}/>
-        <Feed username ={username}/>
+        <Feed username ={user.username}/>
         </div>
-        <div>
-        <Sidebar user = {user}/>
-        </div>
+        
       </div>
     </div>
     <Footer />

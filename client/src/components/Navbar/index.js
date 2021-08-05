@@ -1,16 +1,22 @@
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { FaSearch,  FaHubspot } from "react-icons/fa";
 import { GoBriefcase, GoTerminal } from "react-icons/go";
 import styles from './styles.module.scss';
 
-const Navbar = ( props ) => {
-
+const Navbar = ( ) => {
+    const account = useSelector(state => state.users.user)
+    
     const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+
+    const handlelogOut = () => {
+
+    };
 
         return (
             <div className = {styles.navContainer}>
                 <div className = {styles.navLeft}>
-                <Link to="/">
+                <Link to="/home">
                     <span className = {styles.logo}><FaHubspot className = {styles.logoImg}/> TalentHouse</span>
                 </Link>
                 </div>
@@ -19,7 +25,7 @@ const Navbar = ( props ) => {
                         <FaSearch className = {styles.searchIcon}/>
                         <input placeholder = "Search" type = {styles.searchInput}></input>
                     </div>
-                    <Link to="/">
+                    <Link to="/home">
                         <div className={styles.navIconItem}>
                             <GoBriefcase className = {styles.logoJob}/>
                         </div>
@@ -33,14 +39,14 @@ const Navbar = ( props ) => {
                 <div className = {styles.navRight}>
                     <div className ={styles.navMenu}>
                         <div className ={styles.userInfo}>
-                            <span className={styles.profileInfoName}>{ props.loginToHomepage.username }</span>
+                            <span className={styles.profileInfoName}>{ account.username }</span>
                             <Link to="/profile/:username">
                                 <div className={styles.navImgContainer}>
-                                    <img src = { PF+"person/defaultAvatar.png" } alt = "user" className={styles.navImg} />
+                                    <img src = {account.profilePicture || PF+"person/defaultAvatar.png"  } alt = "user" className={styles.navImg} />
                                 </div>
                             </Link>
                         </div>
-                        <div onClick={ props.handlelogOut }>Log Out</div>
+                        <div onClick={ handlelogOut }>Log Out</div>
                     </div>
                 </div>
                 {/* <div className = {styles.navIcons}>
@@ -65,10 +71,5 @@ const Navbar = ( props ) => {
         )
 }
 
-const mapStateToProps = (state) => {
-    return{
-        loginToHomepage: state.loginToHomepage,
-    }
-} 
 
 export default Navbar;

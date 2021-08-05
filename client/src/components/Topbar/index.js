@@ -1,9 +1,11 @@
-import { connect } from "react-redux";
+import { useSelector } from 'react-redux';
 import ImageUpload from './ImageUpload';
 import styles from './styles.module.scss';
 
 
-const Topbar = ({user}) => {
+const Topbar = () => {
+
+    const user = useSelector(state => state.users.user)
     const PF = process.env.REACT_APP_PUBLIC_FOLDER;
     
     return (
@@ -25,10 +27,4 @@ const Topbar = ({user}) => {
     )
 }
 
-const mapStateToProps = (state) => {
-    return{
-        loginToHomepage: state.loginToHomepage,
-    }
-} 
-
-export default connect(mapStateToProps, null)(Topbar);
+export default Topbar;

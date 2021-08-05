@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
 import { loginSuccess } from "../../features/login/loginSlice";
 
-import { fetchNewAccessJWT } from "../../api/userApi";
+//import { fetchNewAccessJWT } from "../../api/usersAPI";
 import DefaultLayout from "../DefaultLayout/index";
 
 export const PrivateRoute = ({ children, ...rest }) => {
@@ -11,7 +11,7 @@ export const PrivateRoute = ({ children, ...rest }) => {
 	const { isAuth } = useSelector(state => state.login);
 	const { user } = useSelector(state => state.user);
 
-	useEffect(() => {
+	/*useEffect(() => {
 		const updateAccessJWT = async () => {
 			const result = await fetchNewAccessJWT();
 			result && dispatch(loginSuccess());
@@ -22,7 +22,7 @@ export const PrivateRoute = ({ children, ...rest }) => {
 			updateAccessJWT();
 
 		!isAuth && sessionStorage.getItem("accessJWT") && dispatch(loginSuccess());
-	}, [dispatch, isAuth, user._id]);
+	}, [dispatch, isAuth, user._id]);*/
 
 	return (
 		<Route

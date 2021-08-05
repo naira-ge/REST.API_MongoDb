@@ -3,6 +3,9 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const { crateAccessJWT, crateRefreshJWT } = require("../helpers/jwt");
+
+
 //REGISTER User
 router.post("/register", async (req, res) => {
 
@@ -64,15 +67,15 @@ router.post("/refresh", async (req, res) => {
 const generateAccessToken = (user) => {
     return jwt.sign(
             { id: user.id, isAdmin: user.isAdmin },
-            "mySecretKey",
-            { expiresIn: "5s" }
+            process.env.JWT_ACCESS_SECRET,
+            { expiresIn: "1d" }
     );
 };
 
 const generateRefreshToken = (user) => {
     return jwt.sign(
             { id: user.id, isAdmin: user.isAdmin },
-            "myRefreshSecretKey"
+            process.env.JWT_REFRESH_SECRET
     );
 }
 
@@ -86,6 +89,7 @@ router.post("/login", async (req, res) => {
         if (!user) {
             return res.status(404).json("User not found");
         } else {
+
             //Generate an access token 
             const accessToken = generateAccessToken(user);
             const refreshToken = generateRefreshToken(user);
@@ -94,6 +98,7 @@ router.post("/login", async (req, res) => {
             res.status(200).json({
                 username: user.username,
                 isAdmin: user.isAdmin,
+                id: user._id,
                 accessToken,
                 refreshToken,
             });

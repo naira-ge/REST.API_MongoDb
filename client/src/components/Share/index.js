@@ -8,6 +8,8 @@ const Share = (props) => {
     const [file, setFile] = useState('')
     const [userId, setUserId] = useState('')
 
+    const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+
     const dispatch = useDispatch()
     const users = useSelector((state) => state.user)
 
@@ -21,12 +23,14 @@ const Share = (props) => {
 }
 
 const canSave = Boolean(file) && Boolean(userId)
-
-const usersOptions = users.map((user) => (
+    if (users) {
+    const usersOptions = users.map((user) => (
     <option key={user.id} value={user.id}>
       {user.name}
     </option>
   ))
+}
+
 
     return (
         <section className={styles.share}>
@@ -34,7 +38,7 @@ const usersOptions = users.map((user) => (
                 <div className={styles.shareTop}>
                     <div className = {styles.imageContainer}>
                     <img className = {styles.shareProfileImg} 
-                    src = { props.loginToHomepage.img_url } alt = "user" />
+                    src = {  PF+"person/defaultAvatar.png" } alt = "user" />
                     </div>
                     <div className={styles.shareInput}>
                         <textarea

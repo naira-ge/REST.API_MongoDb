@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
 
 import { loginPending, loginSuccess, loginFail } from "../loginSlice";
-import { userLogin } from '../../../api/usersAPI';
+import { userLogin } from '../../../api/usersApi';
 import { getUserProfile } from '../../users/userAction'
 import styles from './styles.module.scss';
 
@@ -55,18 +55,17 @@ const SignIn = (props) => {
 
          try {
             const isAuth = await userLogin({ email, password });
-
+console.log('isAuth', isAuth.data);
             if (isAuth.statusText !== "OK") {
             setPassMsg("Invalid email or password!");
-				return dispatch(loginFail(isAuth.message));
+               return dispatch(loginFail(isAuth.message));
 			}
 
             dispatch(loginSuccess());
-            dispatch(getUserProfile());
-            setEmail("");
-            setPassword("");
+            dispatch(getUserProfile(isAuth.data));
+            
             props.onConfirm();
-            history.push('/');
+            history.push('/home');
 
          } catch (error) {
             setPassMsg("Invalid email or password!");

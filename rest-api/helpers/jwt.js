@@ -6,7 +6,7 @@ const { token } = require("morgan");
 const crateAccessJWT = async (email, _id) => {
     try {
     const accessJWT = await jwt.sign({ email }, process.env.JWT_ACCESS_SECRET, {
-      expiresIn: "15m", 
+      expiresIn: "10d", 
     });
 
     await setJWT(accessJWT, _id);
@@ -20,7 +20,7 @@ const crateAccessJWT = async (email, _id) => {
 const crateRefreshJWT = async (email, _id) => {
   try {
     const refreshJWT = jwt.sign({ email }, process.env.JWT_REFRESH_SECRET, {
-      expiresIn: "1d",
+      expiresIn: "3d",
     });
 
     await storeUserRefreshJWT(_id, refreshJWT);

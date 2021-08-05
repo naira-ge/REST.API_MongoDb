@@ -2,13 +2,15 @@ import { useState } from "react";
 import jwt_decode from "jwt-decode";
 import axios from 'axios';
 
+
 const rootUrl = "http://localhost:8800/api/";
 
 const loginUrl = rootUrl + "auth/login";
-const userProfileUrl = rootUrl + "users/:id"
+const userProfileUrl = rootUrl + "users";
+const userUpdateUrl = rootUrl + "users/:id"
 
 const refreshAccessJWT = rootUrl + "/refresh";
-const logoutUrl = rootUrl + "user/logout";
+const logoutUrl = rootUrl + "users/logout";
 const newAccessJWT = rootUrl + "tokens";
 const userVerificationUrl = userProfileUrl + "/verify";
 
@@ -49,9 +51,10 @@ const userVerificationUrl = userProfileUrl + "/verify";
 export const userLogin = (frmData) => {
 
     return new Promise(async (resolve, reject) => {
+
         try {
             const res = await axios.post(loginUrl, frmData);
-            console.log("res", res.data);
+            console.log("Login Res.", res.data);
             resolve(res);
 
             if (res.statusText === "OK") {
@@ -64,10 +67,13 @@ export const userLogin = (frmData) => {
 
         } catch (error) {
             console.log(error.message);
-            reject(error);
+            reject(error.message);
+            
         }
     });
 };
+
+
 
 export const fetchUser = () => {
     return new Promise(async (resolve, reject) => {
@@ -80,14 +86,29 @@ export const fetchUser = () => {
 
         const res = await axios.get(userProfileUrl, {
         headers: {
-            Authorization: accessToken,
+            authorization: "Bearer " + accessToken,
         },
         });
 
+        console.log('fetchUser', res)
         resolve(res.data);
     } catch (error) {
       console.log(error);
       reject(error.message);
     }
   });
+};
+
+export const updateUser = async (user) => {
+    return new Promise(async (resolve, reject) => {
+
+        try {
+            const res = await axios.patch(userUpdateUrl, user);
+            console.log("Update Res.", res.data);
+            resolve(res);
+        
+        } catch (error) {
+            reject(error.message);
+        }
+    });
 };

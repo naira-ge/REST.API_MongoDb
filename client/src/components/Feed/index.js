@@ -2,7 +2,7 @@
 import React, {useState, useEffect } from 'react';
 import styles from './styles.module.scss';
 import Share from '../Share/index';
-import Post from '../Post/index';
+import Post from '../../features/posts/Post/index';
 import axios from 'axios';
 
 
@@ -40,7 +40,7 @@ const orderedPosts = Array.isArray(posts)
 return (
     <div className ={styles.feed}>
         <div className ={styles.feedWrapper}>
-            <Share />
+            <Share username={username}/>
             {orderedPosts.map((post) => {
                 return <Post key = {post._id} post = {post}/>
             })}

@@ -1,8 +1,21 @@
 import { getUserPending, getUserSuccess, getUserFail } from './usersSlice';
 
-export const getUserProfile = () => (dispatch) => {
+import { fetchUser } from '../../api/usersApi';
+
+
+export const getUserProfile = (fetchData) => async (dispatch) => {
+    dispatch(getUserPending());
+
     try {
-        dispatch(getUserPending());
+
+        if (fetchData) {
+            dispatch(getUserSuccess(fetchData));
+        } else {
+            dispatch(getUserFail("User is not found!"));
+        }
+
+        const result = await fetchUser();
+        console.log('userAction result', result);
 
     } catch (error) {
         dispatch(getUserFail(error.message));

@@ -8,7 +8,7 @@ import styles from './styles.module.scss'
 export default function Home() {
   return (
     <>
-    <Navbar />
+      <Navbar />
     <div className={styles.homeContainer}>
       <Rightbar />
       <Feed />

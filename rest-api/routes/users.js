@@ -2,19 +2,43 @@ const User = require('../models/User');
 const router = require("express").Router();
 const bcrypt = require('bcrypt');
 
+const {insertUser, getUserByEmail, getUserById, updatePassword, storeUserRefreshJWT, verifyUser} = require("../models/User.model");
 const { userAuthorization } = require("../middlewares/authorization");
 
-// get user profile router
+
+// get user profile autorization
 router.get("/", userAuthorization, async (req, res) => {
+    const _id = req.userId;
+	const userProf = await User.findById(_id);
+	const { name, email } = userProf;
+	res.json({
+		user: {
+			_id,
+			name,
+			email,
+		},
+	});
+});
+
+/*
+//get a  user with query
+router.get("/", async(req, res) => {
+    const userId = req.query.userId;
+    const username = req.query.username;
 
     try {
-        const userProf = await User.findById(req.userId);
-        const { password, updateAt, ...other } = user._doc;
+        const user = userId 
+        ? await User.findById(userId) 
+        : await User.findOne({ username: username });
+
+        console.log(userId, username, "user", user)
+
+        const {password, updateAt, ...other} = user._doc;
         res.status(200).json(other);
     } catch(err) {
         return res.status(500).json(err);
     }
-});
+});*/
 
 //update user
 router.patch("/:id", async(req, res) => {
@@ -60,25 +84,6 @@ router.delete("/:id", async(req, res) => {
 
     } else {
         return res.status(403).json("You can delete only your account!");
-    }
-});
-
-//get a  user with query
-router.get("/", async(req, res) => {
-    const userId = req.query.userId;
-    const username = req.query.username;
-
-    try {
-        const user = userId 
-        ? await User.findById(userId) 
-        : await User.findOne({ username: username });
-
-        console.log(userId, username, "user", user)
-
-        const {password, updateAt, ...other} = user._doc;
-        res.status(200).json(other);
-    } catch(err) {
-        return res.status(500).json(err);
     }
 });
 
