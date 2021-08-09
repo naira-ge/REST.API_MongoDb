@@ -51,10 +51,18 @@ const UserSchema = new mongoose.Schema({
         type:String,
         max:50,
     },
-    reletionship:{
-        type:Number,
-        enum:[1, 2, 3],
-    }
+    position:{
+        type:String,
+        max:50,
+    },
+    github:{
+        type:String,
+        max:50,
+    },
+    skills:{
+        type:String,
+        max:50,
+    },
 },
 {timestamps:true}
 );

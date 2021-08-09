@@ -1,0 +1,12 @@
+.loader {
+    align-self: center;
+    color:rgba(28, 55, 211, 0.897);
+    width: 65px;
+    height: 65px;
+    animation:spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(180deg);}
+}

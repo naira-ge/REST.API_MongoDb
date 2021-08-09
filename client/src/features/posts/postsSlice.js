@@ -3,20 +3,11 @@ import { createSlice } from '@reduxjs/toolkit';
 
 
 const initialState = {
-page: 1, 
-column1: [],
-column2: [],
-posts: [
-    {
-        id: uuid(),
-        desc: "Learn React",
-        isComplete: false,
-        comments: [
-            { comment_id: 1, text: 'Learn React comments 1', rate: 3 },
-            { comment_id: 2, text: 'Learn React comments 2', rate: 5 },
-        ]
-    },
-]
+    userPosts: [],
+    isLoading: false,
+    error: '',
+    savePosts: [],
+    page: 1, 
 };
 
 
@@ -24,25 +15,53 @@ const postsSlice = createSlice({
     name:'posts',
     initialState: initialState,
     reducers: {
-        createPost: {
+        getPostsPending: (state) => {
+            state.isLoading = true;
+        },
+        getPostsSuccess: (state, { payload }) => {
+            state.userPosts = payload;
+            state.isLoading = false;
+            state.error = '';
+        },
+        getPostsFail: (state, { payload }) => {
+            state.isLoading = false;
+            state.error = payload;
+        },
+
+        createPostPending: (state) => {
+            state.isLoading = true;
+        },
+
+        createPostSuccess: {
+
             reducer: (state, {payload}) => {
-                state.posts.push(payload);
+                state.userPosts = state.userPosts.push(payload);
+                state.isLoading = false;
+                state.error = '';
             },
-            prepare: ({ desc }) => ({
+
+            prepare: ({ userId, desc }) => ({
                 payload: {
-                    id:uuid(),
-                    desc,
-                    isComplete:false,
-                    comments: "",
+                    like:[],
+                    _id:uuid(),
+                    userId: userId,
+                    desc: desc,
+                    img: "",
                 }
             }),
         },
+
+        createPostFail: (state, { payload }) => {
+            state.isLoading = false;
+            state.error = payload;
+        },
+        
         createComment: {
             reducer: (state, {payload}) => {
-                const postComment = state.posts.find(post => post.id === payload.id);
+                const postComment = state.userPosts.find(post => post.id === payload.id);
                 
                 if(postComment) {
-                    return state.posts[payload.postIndex].comments.push(payload);
+                    return state.userPosts[payload.postIndex].comments.push(payload);
                 }
             },
             prepare: ({ text, id, postIndex }) => ({
@@ -54,14 +73,14 @@ const postsSlice = createSlice({
             }),
             },
             edit: (state, action) => {
-                  const postEdit = state.posts.find(post => post.id === action.payload.id);
+                    const postEdit = state.userPosts.find(post => post.id === action.payload.id);
                     if(postEdit) {
-                      postEdit.desc = action.payload.desc;
+                        postEdit.desc = action.payload.desc;
                     }
             },
             toggle: (state, action) => {
-                  const postToggle = state.column1.find(post => post.id === action.payload.id)  
-                  const postToggle2 = state.column2.find(post => post.id === action.payload.id);
+                    const postToggle = state.column1.find(post => post.id === action.payload.id)  
+                    const postToggle2 = state.column2.find(post => post.id === action.payload.id);
 
             if(postToggle ) {
                 postToggle.isComplete = !postToggle.isComplete;
@@ -82,14 +101,14 @@ const postsSlice = createSlice({
             }
         },
         search: (state, {payload}) => {
-            const searchResult = state.posts.filter(post => {
+            const searchResult = state.userPosts.filter(post => {
                 return post.desc.toLowerCase.includes(payload.value) || 
                 post.comments.filter(comment => {
                     return comment.text.toLowerCase.includes(payload.value)
                 })
             });
             
-            return state.posts = searchResult;
+            return state.userPosts = searchResult;
         },
         filter: (state, action) => {
             const filterPost = action.payload.direction === "asc" ?
@@ -131,9 +150,9 @@ function sortDesc (arr, field) {
     })
 }
 
+const { reducer, actions } = postsSlice;
 
 export const {
-    createPost: postAdded,  
     createComment: createCommentActionCreator, 
     completed:createCompletedActionCreator,
     notComplete:notCompleteActionCreator,
@@ -142,9 +161,13 @@ export const {
     toggle: togglePostActionCreator,
     filter: filterActionCreator,
     setPage: setCurrentPage,
-    columnAdd: columnAddActionCreator} = postsSlice.actions;
+    columnAdd: columnAddActionCreator,
+    getPostsPending,
+    getPostsSuccess,
+    getPostsFail,
+    createPostPending,  
+    createPostSuccess,
+    createPostFail} = actions;
 
-export const selectPosts = (state) => state.post;
 
-
-export default postsSlice.reducer;
+export default reducer;

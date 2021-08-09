@@ -1,9 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    isLoading: false,
+    isLoadingLogIn: false,
     isAuth: false,
-    error: '',
+    errorLogIn: '',
+    isLoadingRegister: false,
+    isAuthRegister:false,
+    errorRegister: '',
 }
 
 const loginSlice = createSlice({
@@ -11,22 +14,34 @@ const loginSlice = createSlice({
     initialState,
     reducers: {
         loginPending: (state) => {
-            state.isLoading = true;
+            state.isLoadingLogIn = true;
         },
         loginSuccess: (state) => {
-            state.isLoading = false;
+            state.isLoadingLogIn = false;
             state.isAuth = true;
-            state.error = '';
+            state.errorLogIn = '';
         },
         loginFail: (state, {payload}) => {
-            state.isLoading = false;
-            state.error = payload;
+            state.isLoadingLogIn = false;
+            state.errorLogIn = payload;
+        },
+        registerPending: (state) => {
+            state.isLoadingRegister = true;
+        },
+        registerSuccess: (state, {payload}) => {
+            state.isLoadingRegister = false;
+            state.isAuthRegister = true;
+            state.errorRegister = '';
+        },
+        registerFail: (state, {payload}) => {
+            state.isLoadingRegister = false;
+            state.errorRegister = payload;
         },
     }
 });
 
 const { reducer, actions } = loginSlice;
 
-export const { loginPending, loginSuccess, loginFail } = actions;
+export const { loginPending, loginSuccess, loginFail, registerPending, registerSuccess, registerFail } = actions;
 
 export default reducer;

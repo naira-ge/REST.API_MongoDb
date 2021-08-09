@@ -97,12 +97,17 @@ a{
         
         .profileInfoName {
             margin-right: 1rem;
+            font-size:.8rem;
         }
     }
 
+    .logOut{
+        font-size:.8rem;
+    }
+
     .navImgContainer{
-        width: 2.6rem;
-        padding-top:2.6rem;
+        width: 7vmin;
+        padding-top:7vmin;
         position:relative;
         border-radius:50%;
     }

@@ -4,7 +4,7 @@ import { useHistory, useLocation } from "react-router-dom";
 
 import { loginPending, loginSuccess, loginFail } from "../loginSlice";
 import { userLogin } from '../../../api/usersApi';
-import { getUserProfile } from '../../users/userAction'
+import { getUserProfile } from '../../users/userAction';
 import styles from './styles.module.scss';
 
 
@@ -55,14 +55,15 @@ const SignIn = (props) => {
 
          try {
             const isAuth = await userLogin({ email, password });
-console.log('isAuth', isAuth.data);
+            console.log('isAuth', isAuth.data);
+
             if (isAuth.statusText !== "OK") {
-            setPassMsg("Invalid email or password!");
+               setPassMsg("Invalid email or password!");
                return dispatch(loginFail(isAuth.message));
-			}
+			   }
 
             dispatch(loginSuccess());
-            dispatch(getUserProfile(isAuth.data));
+            dispatch(getUserProfile(isAuth.data.id));
             
             props.onConfirm();
             history.push('/home');
@@ -100,10 +101,10 @@ console.log('isAuth', isAuth.data);
                   value={password}
                   className={styles.loginInput}></input>
                <p>{passMsg}</p>
-               <button className={styles.loginButton}>Sign In</button>
+               <button type = "submit" className={styles.loginButton}>Sign In</button>
             </form>
-            <div className={styles.signUpContainerFooter}>
-               <p onClick={props.onConfirm}>Don't have an account yet? Sign Up</p>
+            <div className={styles.signUp}>
+               <p onClick={props.onConfirm}>Don't have an account yet? SignUp</p>
             </div>
          </div>
       )

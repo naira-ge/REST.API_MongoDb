@@ -7,7 +7,7 @@ const { userAuthorization } = require("../middlewares/authorization");
 
 
 // get user profile autorization
-router.get("/", userAuthorization, async (req, res) => {
+/*router.get("/", userAuthorization, async (req, res) => {
     const _id = req.userId;
 	const userProf = await User.findById(_id);
 	const { name, email } = userProf;
@@ -18,9 +18,9 @@ router.get("/", userAuthorization, async (req, res) => {
 			email,
 		},
 	});
-});
+});*/
 
-/*
+
 //get a  user with query
 router.get("/", async(req, res) => {
     const userId = req.query.userId;
@@ -38,7 +38,7 @@ router.get("/", async(req, res) => {
     } catch(err) {
         return res.status(500).json(err);
     }
-});*/
+});
 
 //update user
 router.patch("/:id", async(req, res) => {
@@ -58,7 +58,8 @@ router.patch("/:id", async(req, res) => {
             $set: req.body,
             });
 
-            res.status(200).json("Account has been updated");
+            const {password, updateAt, ...other} = user._doc;
+            res.status(200).json(other);
 
         } catch(err) {
             return res.status(500).json(err);
@@ -131,7 +132,7 @@ router.patch("/:id/unfollow", async(req, res) => {
                 res.status(200).json("user has been unfollowed");
 
             } else {
-                res.status(403).json("you dont follow this user");
+                res.status(403).json("you don't follow this user");
             }
     
         } catch(err) {

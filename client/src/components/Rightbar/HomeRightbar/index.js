@@ -5,11 +5,12 @@ import { GoCheck } from "react-icons/go";
 import {followActionCreator, unfollowActionCreator, setJobsActionCreator} from '../../../_reducers/jobCompanyReducer';
 
 const HomeRightbar = (props) => {
-    console.log('HomeRightbar props', props);
+    
+    const PF = process.env.REACT_APP_PUBLIC_FOLDER;
 
     return(
         <div className ={styles.jobsContainer}>
-                    <img className ={styles.jobImg} src = "assets/job/logo.job.png" alt="jobs" />
+            <img className={styles.jobImg} src={PF + "/job/logo.job.png"} alt="jobs" />
                     <span className ={styles.jobsText}>
                     <FaHotjar /> <b>{props.jobs.length} </b> new positions for you
                     </span>

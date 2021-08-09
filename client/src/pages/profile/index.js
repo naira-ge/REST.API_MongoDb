@@ -9,7 +9,7 @@ import { getUserUpdateStart, getUserUpdate, getUserUpdateFail, getUserRemove } f
 import Topbar from '../../components/Topbar/index';
 import Navbar from '../../components/Navbar/index';
 import Sidebar from '../../components/Sidebar/index';
-import Feed from '../../components/Feed/index';
+import Feed from '../../features/posts/Feed/index';
 import Rightbar from '../../components/Rightbar/index';
 import Footer from '../../components/Footer/index';
 import styles from './styles.module.scss';
@@ -19,14 +19,12 @@ export default function UserProfile() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
-  const username = useParams().username;
-
-  const user = useSelector(state => state.users.user);
+  const account = useSelector(state => state.users.user);
   const dispatch = useDispatch();
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    updateUser({ name, email }, dispatch());
+    updateUser({ name, email }, dispatch);
   };
 
   const handleDelete = (e) => {
@@ -34,22 +32,11 @@ export default function UserProfile() {
     dispatch();
   }
 
-  /*
+ 
     useEffect(() => {
-        const fetchUser = async () => {
-            await axios.get(`http://localhost:8800/api/users?username=${username}`)
-            .then(res => {
-                console.log("fetchUser", res.data);
-                setUser(res.data);
-            })
-            .catch(err => {console.log(err)});
-        }
-        fetchUser();
-    }, [username]);*/
+        
+    }, [account]);
   
-/*<div>
-        <Sidebar />
-        </div>*/
   
   return (
     <>
@@ -58,10 +45,12 @@ export default function UserProfile() {
     <Rightbar profile />
       <div className={styles.profileRight}>
         <div>
-        <Topbar user = {user}/>
-        <Feed username ={user.username}/>
+        <Topbar />
+        <Feed />
         </div>
-        
+        <div>
+        <Sidebar user/>
+        </div>
       </div>
     </div>
     <Footer />

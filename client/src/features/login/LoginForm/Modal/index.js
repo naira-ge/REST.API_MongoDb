@@ -1,4 +1,5 @@
 import SignIn from "../SignIn";
+import SignUp from "../SignUp";
 import styles from './styles.module.scss';
 import { FaHubspot } from "react-icons/fa";
 
@@ -26,8 +27,10 @@ const Modal = (props) => {
                     <span className={styles.loginDesc}>
                     Connect talented people around the world 
                     </span>
-                </div>
-                <SignIn onConfirm={confirmHandler}/>
+                    </div>
+                    {props.register ?
+                        <SignUp onConfirm={confirmHandler} /> :
+                        <SignIn onConfirm={confirmHandler} />}
                 </div>
             </div>
         </div>

@@ -6,8 +6,11 @@ import axios from 'axios';
 const rootUrl = "http://localhost:8800/api/";
 
 const loginUrl = rootUrl + "auth/login";
-const userProfileUrl = rootUrl + "users";
-const userUpdateUrl = rootUrl + "users/:id"
+const registerUrl = rootUrl + "auth/register";
+const userProfileUrl = rootUrl + "users/";
+const userUpdateUrl = rootUrl + "users/";
+
+const getUserUrl = rootUrl + "users?userId=";
 
 const refreshAccessJWT = rootUrl + "/refresh";
 const logoutUrl = rootUrl + "users/logout";
@@ -68,12 +71,9 @@ export const userLogin = (frmData) => {
         } catch (error) {
             console.log(error.message);
             reject(error.message);
-            
         }
     });
 };
-
-
 
 export const fetchUser = () => {
     return new Promise(async (resolve, reject) => {
@@ -99,15 +99,56 @@ export const fetchUser = () => {
   });
 };
 
-export const updateUser = async (user) => {
+export const getUser = async (userId) => {
     return new Promise(async (resolve, reject) => {
 
         try {
-            const res = await axios.patch(userUpdateUrl, user);
+            const res = await axios.get(getUserUrl + userId);
+            console.log("Get user Res.", res.data);
+            resolve(res);
+        
+        } catch (error) {
+            reject(error.message);
+        }
+    });
+};
+
+export const updateUser = async (userId, editFields) => {
+    return new Promise(async (resolve, reject) => {
+
+        try {
+            const res = await axios.patch(userUpdateUrl + userId,
+                { userId, ...editFields }
+            );
             console.log("Update Res.", res.data);
             resolve(res);
         
         } catch (error) {
+            reject(error.message);
+        }
+    });
+};
+
+
+export const registerUser = (frmData) => {
+
+    return new Promise(async (resolve, reject) => {
+
+        try {
+            const res = await axios.post(registerUrl, frmData);
+            console.log("Register User.", res.data);
+            resolve(res);
+
+            if (res.statusText === "OK") {
+                sessionStorage.setItem("accessToken", res.data.accessToken);
+                localStorage.setItem(
+                    "TalentHouse",
+                    JSON.stringify({ refreshToken: res.data.refreshToken })
+                );
+            }
+
+        } catch (error) {
+            console.log(error.message);
             reject(error.message);
         }
     });

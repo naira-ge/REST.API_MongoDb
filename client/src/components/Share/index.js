@@ -1,36 +1,38 @@
 import React, { useState } from 'react';
 import { FaRegImages, FaMapMarkerAlt, FaTags, FaRegSmileWink, FaShare} from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
-import { postAdded } from '../../features/posts/postsSlice';
+
+import { createUserPost } from '../../api/postsApi';
 import styles from './styles.module.scss';
 
-const Share = (props) => { 
-    const [file, setFile] = useState('')
-    const [userId, setUserId] = useState('')
+const Share = () => {
+    const account = useSelector(state => state.users.user);
+    const dispatch = useDispatch();
+
+    const [file, setFile] = useState('');
+    const userId = account._id;
 
     const PF = process.env.REACT_APP_PUBLIC_FOLDER;
 
-    const dispatch = useDispatch()
-    const users = useSelector((state) => state.user)
-
     const onContentChanged = (e) => setFile(e.target.value)
 
-    const onSavePostClicked = () => {
-    if (file) {
-        dispatch(postAdded( file, userId))
-        setFile('')
+    const onSavePostClicked = (e) => {
+        e.preventDefault();
+
+        if (file) {
+            createUserPost(userId, file, dispatch)
+            setFile('')
     }
 }
 
 const canSave = Boolean(file) && Boolean(userId)
-    if (users) {
-    const usersOptions = users.map((user) => (
+    if (account) {
+    /*const usersOptions = account.map((user) => (
     <option key={user.id} value={user.id}>
       {user.name}
     </option>
-  ))
+  ))*/
 }
-
 
     return (
         <section className={styles.share}>
@@ -38,13 +40,13 @@ const canSave = Boolean(file) && Boolean(userId)
                 <div className={styles.shareTop}>
                     <div className = {styles.imageContainer}>
                     <img className = {styles.shareProfileImg} 
-                    src = {  PF+"person/defaultAvatar.png" } alt = "user" />
+                    src = {account.profilePicture ||  PF+"person/defaultAvatar.png" } alt = "user" />
                     </div>
                     <div className={styles.shareInput}>
                         <textarea
                         id="postContent"
                         name="postContent"
-                        placeholder="What's on your mind?"
+                        placeholder={`What's on your mind ${account.username || ""}?`}
                         value={file}
                         onChange={onContentChanged}/>
                     </div>

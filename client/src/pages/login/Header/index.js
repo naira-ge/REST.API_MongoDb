@@ -7,13 +7,20 @@ import Backdrop from '../../../features/login/LoginForm/Modal/Backdrop';
 
 const Header = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [register, setRegister] = useState(false);
 
-    function openModalhandler(){
-        setModalIsOpen(true);
+    function openModalHandler(signUp) {
+        if (signUp) {
+            setRegister(true)
+            setModalIsOpen(true)
+        };
+        
+        setModalIsOpen(true)
     }
 
-    function closeModaleHandler(){
+    function closeModalHandler(){
         setModalIsOpen(false);
+        setRegister(false);
     }
     
     return(
@@ -23,16 +30,23 @@ const Header = () => {
                 </div>
                 <div className = {styles.navRight}>
                 <div className ={styles.navMenu}>
-                    <p  onClick={openModalhandler}>Sign Up</p>
+                    <p onClick={() => openModalHandler("signUp")}>Sign Up</p>
                     <span>/</span>
-                    <p onClick={openModalhandler}>Sign In</p>
+                    <p onClick={() => openModalHandler()}>Sign In</p>
                     </div>
                 </div>
-                {modalIsOpen && (<Modal 
-                onCancel = {closeModaleHandler}
-                onConfirm = {closeModaleHandler}
-                />) }
-                {modalIsOpen && <Backdrop onClick = {closeModaleHandler}/>}
+            {modalIsOpen && (
+                register ?
+                <Modal
+                register
+                onCancel = {closeModalHandler}
+                onConfirm = {closeModalHandler}
+                    /> :
+                <Modal
+                onCancel = {closeModalHandler}
+                onConfirm = {closeModalHandler}
+                />)}
+                {modalIsOpen && <Backdrop onClick = {closeModalHandler}/>}
         </div>
     )
 }

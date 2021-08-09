@@ -1,9 +1,10 @@
 import styles from "./styles.module.scss";
-import OptionList from './OptionList/index';
+import Userinfo from './UserInfo/index';
 import ExploreUsers from './ExploreUsers/index';
 import OnlineUsers from './OnlineUsers/index';
 import FollowUser from './FollowUser/index';
 
+/*<FollowUser profile/>*/
 
 const Sidebar = ({ user }) => {
     return (
@@ -11,8 +12,8 @@ const Sidebar = ({ user }) => {
             <div className ={styles.sidebarWrapper}>
             {user ? 
             <>
-            <OptionList user  = {user}/>
-            <FollowUser profile/>
+            <Userinfo user={user} />
+                        
             </> : 
             <>
             <ExploreUsers />

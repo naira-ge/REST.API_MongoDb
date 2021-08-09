@@ -6,30 +6,6 @@ const jwt = require("jsonwebtoken");
 const { crateAccessJWT, crateRefreshJWT } = require("../helpers/jwt");
 
 
-//REGISTER User
-router.post("/register", async (req, res) => {
-
-    try {
-        //generate new password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.password, salt);
-        
-        //create new user
-        const newUser = new User({
-            username: req.body.username,
-            email: req.body.email,
-            password: hashedPassword,
-        });        
-        
-        //save user and return respond
-        const user = await newUser.save();
-        res.status(200).json(user);
-
-    } catch(err) {
-        res.status(500).json(err);
-    }
-});
-
 //Refresh token
 const refreshTokens = [];
 
@@ -79,6 +55,42 @@ const generateRefreshToken = (user) => {
     );
 }
 
+//REGISTER User
+router.post("/register", async (req, res) => {
+
+    try {
+        //generate new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+        
+        //create new user
+        const newUser = new User({
+            username: req.body.username,
+            email: req.body.email,
+            password: hashedPassword,
+        });
+        
+        //save user and return respond
+        const user = await newUser.save();
+
+        //Generate an access token 
+            const accessToken = generateAccessToken(user.email);
+            const refreshToken = generateRefreshToken(user.email);
+            refreshTokens.push(refreshToken);
+
+            const {password, updateAt, createdAt, ...other} = user._doc;
+        
+        res.status(200).json({
+                ...other,
+                accessToken,
+                refreshToken
+        });
+
+    } catch(err) {
+        res.status(500).json(err);
+    }
+});
+
 
 //LOGIN User
 router.post("/login", async (req, res) => {
@@ -91,8 +103,8 @@ router.post("/login", async (req, res) => {
         } else {
 
             //Generate an access token 
-            const accessToken = generateAccessToken(user);
-            const refreshToken = generateRefreshToken(user);
+            const accessToken = generateAccessToken(user.email);
+            const refreshToken = generateRefreshToken(user.email);
             refreshTokens.push(refreshToken);
 
             res.status(200).json({
