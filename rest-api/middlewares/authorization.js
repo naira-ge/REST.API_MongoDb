@@ -4,27 +4,29 @@ const { getJWT, deleteJWT } = require("../helpers/redis");
 const userAuthorization = async (req, res, next) => {
   const { authorization } = req.headers;
 
-  console.log(authorization);
+  //verify if jwt is valid
+  const decoded = await verifyAccessJWT(authorization);
 
-  const decoded = await  jwt.verify(authorization, process.env.JWT_ACCESS_SECRET, (err, user) => {
-            if (err) {
-                return res.status(403).json("Token is not valid");
-            }
-            req.user = user;
-            next();
-    });
-
-    console.log(decoded, 'decoded');
-
-    if (!decoded) {
+  if (decoded.email) {
+    //check if jwt is exit in redis
+    const userId = await getJWT(authorization);
+  
+    if (!userId) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
-  decoded = userId;
-  next();
-  
+    req.userId = userId;
+
+    return next();
   };
 
+  //delete old token from redis db
+  deleteJWT(authorization);
+
+  return res.status(403).json({ message: "Forbidden JWT" });
+}
+
+/*
 const verify = (req, res, next) => {
 
   const authHeader = req.headers.authorization;
@@ -43,9 +45,9 @@ const verify = (req, res, next) => {
     } else {
         res.status(401).json("You are not authenticated!")
     }
-};
+};*/
 
 module.exports = {
     userAuthorization,
-    verify
+    /*verify*/
 };

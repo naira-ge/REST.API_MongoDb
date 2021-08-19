@@ -1,15 +1,10 @@
 @import '../../../styles/variables';
-/*
-=============== 
-Widgets
-===============
-*/
+
   .review {
     width:100%;
     height:100%;
     display:grid;
-    position:sticky;
-    grid-template-rows: 1.5fr .7fr 1.5fr 1fr;
+    grid-template-rows: 1.5fr .7fr 1.8fr 1fr;
     align-items:center;
     text-align: center;
     padding:1rem 1.5rem;

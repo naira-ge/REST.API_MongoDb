@@ -2,8 +2,6 @@ import React, {useState} from 'react';
 import Job from '../Job/index';
 import Share from '../Share/index';
 import styles from './styles.module.scss';
-import {connect} from "react-redux";
-import {followActionCreator, unfollowActionCreator, setJobsActionCreator} from '../../_reducers/jobCompanyReducer';
 import axios from 'axios';
 
 const GITHUB_JOBS_API_URL = 'https://remotive.io/api/remote-jobs';
@@ -46,18 +44,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        follow: (jobId) => {
-            dispatch(followActionCreator(jobId))
-        },
-        unfollow: (jobId) => {
-            dispatch(unfollowActionCreator(jobId))
-        },
-        setJob: (jobs) => {
-            dispatch(setJobsActionCreator(jobs))
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(JobFeed);
+export default JobFeed;

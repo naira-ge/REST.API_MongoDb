@@ -1,12 +1,14 @@
 import styles from './styles.module.scss';
-import HomeRightbar from './HomeRightbar/index';
+import Rating from './Rating/index';
 
 
-const Rightbar = ({profile}) => {
+const Rightbar = ({ profile }) => {
+    
+    
     return (
         <div className ={styles.rightbar}>
             <div className ={styles.rightbarWrapper}>
-                <HomeRightbar /> 
+                {profile ? < Rating profile/> : < Rating />}
             </div>
         </div>
     )

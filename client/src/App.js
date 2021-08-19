@@ -1,30 +1,35 @@
-import React, {useState} from 'react';
-import { useSelector } from 'react-redux';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { PrivateRoute } from './components/PrivateRoute/index';
 
 
 //Pages
-import home from './pages/home/index';
-import commenthome from './pages/commenthome/index';
+import Home from './pages/home/index';
 import login from './pages/login/LogIn/index';
-import userprofile from './pages/profile/index';
+import Profile from './pages/profile/index';
 import notFound from './pages/404/index';
+import PostDetail from './pages/postDetail/index';
 
 
 const App = () => {
-    //const user = useSelector(selectUser);
-   
+
     return(
-    <BrowserRouter>
+        <Router>
             <Switch>
-            <Route exact path = "/" component = {login}/>
-            <Route exact path = "/comments" component = {commenthome}/>
-            <Route exact path = "/profile/:username" component = {userprofile}/>
-            <Route exact path = "/home" component = {home}/>
-            <Route path="*" component = {notFound} />
-        </Switch>
-    </BrowserRouter>
+                <Route exact path="/" component={login} />
+                
+                <PrivateRoute exact path="/profile/:username">
+                    <Profile />
+                </PrivateRoute>
+                <PrivateRoute exact path="/home">
+                    <Home />
+                </PrivateRoute>
+                <PrivateRoute exact path="/post/:pId">
+                    <PostDetail />
+                </PrivateRoute>
+                
+                <Route path="*" component = {notFound} />
+            </Switch>
+        </Router>
     ) 
 }
 

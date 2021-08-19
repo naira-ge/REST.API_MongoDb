@@ -5,51 +5,19 @@ import axios from 'axios';
 
 const rootUrl = "http://localhost:8800/api/";
 
-const loginUrl = rootUrl + "auth/login";
+const loginUrl = rootUrl + "users/login";
+const getUserUrl = rootUrl + "users";
+const logoutUrl = rootUrl + "users/logout";
+const newAccessJWT = rootUrl + "tokens";
+
 const registerUrl = rootUrl + "auth/register";
 const userProfileUrl = rootUrl + "users/";
 const userUpdateUrl = rootUrl + "users/";
-
-const getUserUrl = rootUrl + "users?userId=";
-
 const refreshAccessJWT = rootUrl + "/refresh";
-const logoutUrl = rootUrl + "users/logout";
-const newAccessJWT = rootUrl + "tokens";
+
+
 const userVerificationUrl = userProfileUrl + "/verify";
 
-
-//refresh token automatically
-    /*const refreshToken = async () => {
-        try {
-            const res = await axios.post("/http://localhost:8800/api/auth/refresh",
-                { token: user.refreshToken });
-                setUser({
-                ...user,
-                accessToken: res.data.accessToken,
-                refreshToken: res.data.refreshToken,
-                })
-                return res.data;
-            } catch (err) {
-            console.log("refresh token", err);
-            }
-        };
-
-    const axiosJWT = axios.create();
-
-    axiosJWT.interceptors.request.use(
-        async (config) => {
-            let currentDate = new Date();
-            const decodedToken = jwt_decode(user.accessToken);
-            if (decodedToken.exp * 1000 < currentDate.getTime()) {
-                const data = await refreshToken();
-                config.headers["authorization"] = "Bearer " + data.accessToken;
-            }
-            return config;
-        },
-        (error) => {
-            return Promise.reject(error);
-        }
-    );*/
 
 export const userLogin = (frmData) => {
 
@@ -57,19 +25,17 @@ export const userLogin = (frmData) => {
 
         try {
             const res = await axios.post(loginUrl, frmData);
-            console.log("Login Res.", res.data);
-            resolve(res);
+            resolve(res.data);
 
-            if (res.statusText === "OK") {
-                sessionStorage.setItem("accessToken", res.data.accessToken);
+            if (res.data.status === "success") {
+                sessionStorage.setItem("accessJWT", res.data.accessJWT);
                 localStorage.setItem(
                     "TalentHouse",
-                    JSON.stringify({ refreshToken: res.data.refreshToken })
+                    JSON.stringify({ refreshJWT: res.data.refreshJWT })
                 );
             }
 
         } catch (error) {
-            console.log(error.message);
             reject(error.message);
         }
     });
@@ -78,50 +44,78 @@ export const userLogin = (frmData) => {
 export const fetchUser = () => {
     return new Promise(async (resolve, reject) => {
     try {
-        const accessToken = sessionStorage.getItem("accessToken");
+        const accessJWT = sessionStorage.getItem("accessJWT");
 
-        if (!accessToken) {
+        if (!accessJWT) {
         reject("Token not found!");
         }
 
-        const res = await axios.get(userProfileUrl, {
+        const res = await axios.get(getUserUrl, {
         headers: {
-            authorization: "Bearer " + accessToken,
+            Authorization: accessJWT,
         },
         });
 
-        console.log('fetchUser', res)
+        console.log('fetchUser', res.data);
         resolve(res.data);
     } catch (error) {
-      console.log(error);
       reject(error.message);
     }
   });
 };
 
-export const getUser = async (userId) => {
-    return new Promise(async (resolve, reject) => {
 
+export const fetchNewAccessJWT = () => {
+    return new Promise(async (resolve, reject) => {
         try {
-            const res = await axios.get(getUserUrl + userId);
-            console.log("Get user Res.", res.data);
-            resolve(res);
-        
-        } catch (error) {
-            reject(error.message);
+            const { refreshJWT } = JSON.parse(localStorage.getItem("TalentHouse"));
+
+            if (!refreshJWT) {
+            reject("Token not found!");
         }
-    });
+
+        const res = await axios.get(newAccessJWT, {
+            headers: {
+                Authorization: refreshJWT,
+            },
+        });
+
+        if (res.data.status === "success") {
+            sessionStorage.setItem("accessJWT", res.data.accessJWT);
+        }
+
+        resolve(true);
+    } catch (error) {
+        if (error.message === "Request failed with status code 403") {
+            localStorage.removeItem("TalentHouse");
+            localStorage.removeItem("refreshToken");
+        }
+        reject(false);
+    }
+});
 };
 
-export const updateUser = async (userId, editFields) => {
-    return new Promise(async (resolve, reject) => {
+export const userLogout = async () => {
+    try {
+        await axios.delete(logoutUrl, {
+            headers: {
+                Authorization: sessionStorage.getItem("accessJWT"),
+            },
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+};
 
+export const updateUser = async (editFields) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            const res = await axios.patch(userUpdateUrl + userId,
-                { userId, ...editFields }
-            );
-            console.log("Update Res.", res.data);
-            resolve(res);
+            const result = await axios.patch(getUserUrl,  editFields, {
+            headers: {
+                Authorization: sessionStorage.getItem("accessJWT"),
+            },
+        });
+            resolve(result);
         
         } catch (error) {
             reject(error.message);
@@ -132,7 +126,7 @@ export const updateUser = async (userId, editFields) => {
 
 export const registerUser = (frmData) => {
 
-    return new Promise(async (resolve, reject) => {
+    /*return new Promise(async (resolve, reject) => {
 
         try {
             const res = await axios.post(registerUrl, frmData);
@@ -151,5 +145,7 @@ export const registerUser = (frmData) => {
             console.log(error.message);
             reject(error.message);
         }
-    });
+    });*/
 };
+
+

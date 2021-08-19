@@ -1,10 +1,8 @@
 import React, {useEffect} from 'react';
 import styles from './styles.module.scss';
 import {  FaMinus } from "react-icons/fa";
-import {connect} from "react-redux";
 import axios from 'axios';
 import { GoRuby, GoCheck } from "react-icons/go";
-import {followActionCreator, unfollowActionCreator, setUsersActionCreator} from '../../../_reducers/userReducer';
 
 const GITHUB_USERS_API_URL = 'https://api.github.com/users';
 
@@ -59,24 +57,4 @@ const FollowUser = (props) => {
     )
 }
 
-const mapStateToProps = (state) => {
-    return {
-        users: state.users.users,
-    }
-}
-
-const mapDispatchToProps = (dispatch) => {
-    return {
-        follow: (userId) => {
-            dispatch(followActionCreator(userId))
-        },
-        unfollow: (userId) => {
-            dispatch(unfollowActionCreator(userId))
-        },
-        setUser: (users) => {
-            dispatch(setUsersActionCreator(users))
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(FollowUser);
+export default FollowUser;

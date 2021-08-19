@@ -1,64 +1,56 @@
 import { getUserPending, getUserSuccess, getUserFail, getUserUpdateStart, getUserUpdate, getUserUpdateFail, getUserRemove } from './usersSlice';
 
-import { getUser, updateUser } from '../../api/usersApi';
+import { fetchUser, updateUser, registerUser } from '../../api/usersApi';
 
 
-export const getUserProfile = (userId) => async (dispatch) => {
-    dispatch(getUserPending());
 
+export const getUserProfile = () => async (dispatch) => {
     try {
+        dispatch(getUserPending());
 
-        if (userId) {
-            const result = await getUser(userId);
-            console.log('userProf res.', result);
+            const result = await fetchUser();
 
-            if (result.statusText === "OK") {
-                dispatch(getUserSuccess(result.data));
+            if (result.user && result.user._id) {
+                return dispatch(getUserSuccess(result.user));
             }
-
-        } else {
-            dispatch(getUserFail("User is not found!"));
-        }
+         dispatch(getUserFail("User is not found!"));
 
     } catch (error) {
         dispatch(getUserFail(error.message));
     }
 };
 
-export const updateUserProfile = async (userId, editFields, dispatch) => {
+export const updateUserProfile = (editFields) => async (dispatch) => {
     dispatch(getUserUpdateStart());
 
-    try {
+    try {    
+            const result = await updateUser(editFields);
+            console.log('UpdateUser res.', result);
 
-        if (userId) {    
-            const result = await updateUser(userId, editFields);
-            console.log('userProf res.', result);
+            if (result.status === "error") {
+                return dispatch(getUserUpdateFail("User is not found!"));
+            };
 
-            if (result.statusText === "OK") {
-                dispatch(getUserSuccess(result.data));
-            }
-
-        } else {
-            dispatch(getUserUpdateFail("User is not found!"));
-        }
+            return dispatch(getUserSuccess(result.data));
 
     } catch (error) {
         dispatch(getUserUpdateFail(error.message));
     }
-}
+};
 
-export const setUserProfile = (user) => async (dispatch) => {
+export const registerNewUser = (info) => async (dispatch) => {
     dispatch(getUserPending());
 
     try {
+        const result = await registerUser(info);
+            console.log('register res.', result);
 
-        if (user) {
-            await dispatch(getUserSuccess(user));
+            if (result.status === "error") {
+                return dispatch(getUserUpdateFail("Try again can't create account"));
+            };
+
+            return dispatch(getUserSuccess(result.data));
             
-            } else {
-            dispatch(getUserFail("User is not found!"));
-        }
-
     } catch (error) {
         dispatch(getUserFail(error.message));
     }

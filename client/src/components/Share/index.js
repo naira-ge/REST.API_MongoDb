@@ -1,54 +1,67 @@
-import React, { useState } from 'react';
-import { FaRegImages, FaMapMarkerAlt, FaTags, FaRegSmileWink, FaShare} from "react-icons/fa";
+import { useEffect, useState } from 'react';
+import { FaRegImages } from "react-icons/fa";
+import { IoSendSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
-
-import { createUserPost } from '../../api/postsApi';
+import { createPost } from '../../features/posts/postAction';
 import styles from './styles.module.scss';
 
+const initialFormData = {
+    title: "",
+    desc: "",
+}
+
 const Share = () => {
-    const account = useSelector(state => state.users.user);
+    const { user } = useSelector(state => state.users);
     const dispatch = useDispatch();
 
-    const [file, setFile] = useState('');
-    const userId = account._id;
-
     const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+    
+    const [formData, setFormData] = useState(initialFormData);
+    const { title, desc } = formData;
 
-    const onContentChanged = (e) => setFile(e.target.value)
+    useEffect(() => {}, [user, formData]);
 
-    const onSavePostClicked = (e) => {
+    
+    const handleOnChange = (e) => {
+        const { name, value } = e.target;
+
+        setFormData({
+            ...formData,
+            [name]: value,
+            })
+    };
+
+
+    const handleOnSubmit = (e) => {
         e.preventDefault();
 
-        if (file) {
-            createUserPost(userId, file, dispatch)
-            setFile('')
+        if (formData) {
+            dispatch(createPost(formData));
+            setFormData({ title: '', desc: '' });
     }
 }
-
-const canSave = Boolean(file) && Boolean(userId)
-    if (account) {
-    /*const usersOptions = account.map((user) => (
-    <option key={user.id} value={user.id}>
-      {user.name}
-    </option>
-  ))*/
-}
-
     return (
         <section className={styles.share}>
-            <form className={styles.shareWrapper}>
+            <div className={styles.shareWrapper}>
                 <div className={styles.shareTop}>
                     <div className = {styles.imageContainer}>
                     <img className = {styles.shareProfileImg} 
-                    src = {account.profilePicture ||  PF+"person/defaultAvatar.png" } alt = "user" />
+                    src = {user.profilePicture ||  PF+"person/defaultAvatar.png" } alt = "user" />
                     </div>
                     <div className={styles.shareInput}>
+                        <input
+                        name="title"
+                        type = "text"
+                        placeholder={'Share your idea'}
+                        value={title}
+                        className = {styles.postTitle}
+                        onChange={handleOnChange}
+                        />
                         <textarea
-                        id="postContent"
-                        name="postContent"
-                        placeholder={`What's on your mind ${account.username || ""}?`}
-                        value={file}
-                        onChange={onContentChanged}/>
+                        name="desc"
+                        placeholder={`What's on your mind ${user.username || ""}?`}
+                        value={desc}
+                        onChange={handleOnChange}/>
                     </div>
                 </div>
                 <hr className={styles.shareHr} />
@@ -58,26 +71,15 @@ const canSave = Boolean(file) && Boolean(userId)
                             <FaRegImages className={styles.shareIcon}/>
                             <span className = {styles.shareOptionText}>Photo or Video</span>
                         </div>
-                        <div className ={styles.shareOption}>
-                            <FaTags className={styles.shareIcon}/>
-                            <span className = {styles.shareOptionText}>Tag</span>
-                        </div>
-                        <div className ={styles.shareOption}>
-                            <FaMapMarkerAlt className={styles.shareIcon}/>
-                            <span className = {styles.shareOptionText}>Location</span>
-                        </div>
-                        <div className ={styles.shareOption}>
-                            <FaRegSmileWink className={styles.shareIcon}/>
-                            <span className = {styles.shareOptionText}>Emojis</span>
-                        </div>
                     </div>
-                    <button 
+                    <button
+                    type = "submit"    
                     className = {styles.shareButton}
-                    onClick={onSavePostClicked} disabled={!canSave}>
-                    <FaShare />
+                    onClick={handleOnSubmit}>
+                    <IoSendSharp />
                     </button>
                 </div>
-            </form>
+            </div>
         </section>
     )
 }

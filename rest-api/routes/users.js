@@ -1,75 +1,201 @@
-const User = require('../models/User');
-const router = require("express").Router();
+const express = require('express');
+const router = express.Router();
+const User = require('../models/user/User.schema');
 const bcrypt = require('bcrypt');
 
-const {insertUser, getUserByEmail, getUserById, updatePassword, storeUserRefreshJWT, verifyUser} = require("../models/User.model");
+const {insertUser, getUserByEmail, getUserById, updatePassword, storeUserRefreshJWT, updateUserInfo, verifyUser} = require("../models/user/User.model");
+const { hashPassword, comparePassword } = require("../helpers/bcrypt");
+const { crateAccessJWT, crateRefreshJWT } = require("../helpers/jwt");
 const { userAuthorization } = require("../middlewares/authorization");
+const { setPasswordResetPin, getPinByEmail, deletePin } = require("../models/resetPin/ResetPin.model");
+const { emailProcessor } = require("../helpers/nodemailer");
+const { resetPassReqValidation, updatePassValidation } = require("../middlewares/formValidationJoi");
+const { deleteJWT } = require("../helpers/redis");
 
+//root router
+router.all('/', (req, res, next) => {
+    //res.json({ message: "return user router" });
 
-// get user profile autorization
-/*router.get("/", userAuthorization, async (req, res) => {
+    next();
+});
+
+// Get user profile authorization
+router.get('/', userAuthorization, async (req, res) => {
+    //extract user id
     const _id = req.userId;
-	const userProf = await User.findById(_id);
-	const { name, email } = userProf;
-	res.json({
-		user: {
-			_id,
-			name,
-			email,
-		},
-	});
-});*/
+    
+    //get user profile based on the user id
+    const userProf = await getUserById(_id);
 
+    const {password, updatedAt, refreshJWT, createdAt, ...other} = userProf._doc;
 
-//get a  user with query
-router.get("/", async(req, res) => {
-    const userId = req.query.userId;
-    const username = req.query.username;
+    res.json({ user: other });
+});
+
+//Create and register new user route
+router.post('/', async (req, res) => {
+    const { email, username, password } = req.body;
 
     try {
-        const user = userId 
-        ? await User.findById(userId) 
-        : await User.findOne({ username: username });
+        //hash password
+        const hashedPassword = await hashPassword(password);
 
-        console.log(userId, username, "user", user)
+        //create new user
+        const newUser = {
+            username,
+            email,
+            password: hashedPassword,
+        };
 
-        const {password, updateAt, ...other} = user._doc;
-        res.status(200).json(other);
-    } catch(err) {
-        return res.status(500).json(err);
+        const result = await insertUser(newUser);
+        res.json({ message: "New user created", result });
+
+    } catch (error) {
+        res.status(500).json({status: "error", message: error.message});
     }
 });
 
-//update user
-router.patch("/:id", async(req, res) => {
-    if(req.body.userId === req.params.id || req.body.isAdmin) {
-        if(req.body.password) {
-            try {
-                const salt = await bcrypt.genSalt(10);
-                req.body.password = await bcrypt.hash(req.body.password, salt);
+//User SignIn route
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+        return res.json({ status: "error", message: "Invalid form submission!" });
+    };
 
-            } catch(err) {
-                return res.status(500).json(err);
-            }
-        }
+    //get user with email from db 
+    const user = await getUserByEmail(email);
+    
+    const passFromDb = user && user._id ? user.password : null;
 
-        try {
-            const user = await User.findByIdAndUpdate(req.body.userId, {
-            $set: req.body,
+    if (!passFromDb) {
+        return res.json({ status: "error", message: "Invalid email or password!" })
+    }
+
+    //hash password and compare with db password
+    const validPassword = await comparePassword(password, passFromDb);
+
+    if (!validPassword) {
+        res.json({ status: "error", message: "Password incorrect!" });
+    }
+
+    const accessJWT = await crateAccessJWT(user.email, `${user._id}`);
+    const refreshJWT = await crateRefreshJWT(user.email, `${user._id}`);
+
+    res.json({
+        status: "success",
+        message: "Login Successfully!",
+        accessJWT,
+        refreshJWT
+    });
+});
+
+//User reset password pin
+router.post('/reset-password', resetPassReqValidation, async (req, res) => {
+    const { email } = req.body;
+
+    const user = await getUserByEmail(email);
+
+    if (user && user._id) {
+        //create unique 6 digit pin
+        const setPin = await setPasswordResetPin(email);
+        await emailProcessor({ email, pin: setPin.pin, type: "request-new-password" });
+
+        return res.json({
+                status: "success",
+                message:
+                    "If the email is exist in our database, the password reset pin will be sent to your email shortly."
             });
+    };
 
-            const {password, updateAt, ...other} = user._doc;
-            res.status(200).json(other);
-
-        } catch(err) {
-            return res.status(500).json(err);
-        }
-
-    } else {
-        return res.status(403).json("You can update only your account!");
-    }
+    return res.json({
+        status: "error",
+        message:
+            "If the email is exist in our database, the password reset pin will be sent to your email shortly."
+    });
 });
 
+//User reset password
+router.patch('/reset-password', updatePassValidation, async (req, res) => {
+    const { email, pin, newPassword } = req.body;
+    
+    const getPin = await getPinByEmail(email, pin);
+
+    //validate pin
+    if (getPin._id) {
+
+        const dbDate = getPin.createdAt;
+        const expiresIn = 1;
+
+        let expDate = dbDate.setDate(dbDate.getDate() + expiresIn);
+        const today = new Date();
+
+        if (today > expDate) {
+            return res.json({status: "error", message: "Invalid or expired pin"});
+        }
+        
+        //encrypt new password
+        const hashPass = await hashPassword(newPassword);
+        const user = await updatePassword(email, hashPass);
+
+        if (user._id) {
+            //send email notification
+            await emailProcessor({ email, type: "password-update-success" });
+
+            //delete pin from db
+            deletePin(email, pin);
+
+            return res.json({ status: "success", message: "Your password has been updated!" });
+        }
+    }
+    
+    res.json({ status: "error", message: "Unable to update your password, please try later." });
+});
+
+// User logout and invalidate jwt
+router.delete('/logout', userAuthorization, async (req, res) => {
+    const { authorization } = req.headers;
+
+    //extract user id
+    const _id = req.userId;
+
+    //delete accessJWT from redis database
+    deleteJWT(authorization);
+
+    //delete refreshJWT from mangoDb
+    const result = await storeUserRefreshJWT(_id, '');
+
+    if (result._id) {
+        return res.json({ status: "success", message: "Log out successfully" });
+    }
+
+    res.json({ status: "error", message: "Unable to log out, please try again later" });
+});
+
+//Update user information
+router.patch('/', userAuthorization, async(req, res) => {
+        try {
+            //extract user id
+            const _id = req.userId;
+
+            const { username, profilePicture, coverPicture, desc, city, phone, company, position, github, skills, portfolio } = req.body;
+            console.log(req.body, "_id", _id);
+
+            const user = await updateUserInfo(_id, req.body);
+            
+            if (user._id) {
+            const {password, updateAt, ...result} = user._doc;
+                return res.status(200).json({ status: "success", result });
+                
+            };
+
+            res.status(403).json("You can update only your account!",);
+        } catch(err) {
+            return res.status(403).json(err.message);
+        }
+});
+
+/*
 //delete user
 router.delete("/:id", async(req, res) => {
     if(req.body.userId === req.params.id || req.body.isAdmin) {
@@ -142,7 +268,7 @@ router.patch("/:id/unfollow", async(req, res) => {
     } else {
         return res.status(403).json("You can't unfollow yourself")
     }
-})
+});*/
 
 
 module.exports = router;

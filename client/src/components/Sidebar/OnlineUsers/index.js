@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from '../styles.module.scss';
 import Online from './Online/index';
-import {users} from '../../../dummyData';
+import {users} from './dummyData';
 
 const OnlineUsers = ({profile}) => {
     return (

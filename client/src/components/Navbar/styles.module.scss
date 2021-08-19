@@ -52,33 +52,8 @@ a{
         color:white;
         font-size:1.3rem;
     }
-
-    .searchbar{
-        width: 85%;
-        height:30px;
-        background-color: white;
-        border-radius: .8rem;
-        display:flex;
-        align-items: center;
-
-        .searchIcon{
-            font-size: 1.2rem !important;
-            margin: 0 .6rem;
-            color:grey;
-        }
-        input{
-            border:none;
-            outline:none;
-            width: 70%;
-            font-size: 1rem;
-            font-weight:600;
-            color:grey;
-        }
-        input:focus{
-            outline:none;
-        }
-    }
 }
+
 .navRight{
     color:white;
     font-size: 2rem;
@@ -96,7 +71,7 @@ a{
         flex-direction: column nowrap;
         
         .profileInfoName {
-            margin-right: 1rem;
+            margin-right: .5rem;
             font-size:.8rem;
         }
     }
@@ -106,8 +81,8 @@ a{
     }
 
     .navImgContainer{
-        width: 7vmin;
-        padding-top:7vmin;
+        width: 40px;
+        padding-top:40px;
         position:relative;
         border-radius:50%;
     }

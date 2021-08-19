@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { FaHubspot } from "react-icons/fa";
 import styles from './styles.module.scss';
-import Modal from '../../../features/login/LoginForm/Modal/index';
-import Backdrop from '../../../features/login/LoginForm/Modal/Backdrop';
+import Entry from '../../../components/LogIn/Entry';
+import Backdrop from '../../../components/LogIn/Entry/Backdrop';
 
 
 const Header = () => {
@@ -37,12 +37,12 @@ const Header = () => {
                 </div>
             {modalIsOpen && (
                 register ?
-                <Modal
+                <Entry
                 register
                 onCancel = {closeModalHandler}
                 onConfirm = {closeModalHandler}
                     /> :
-                <Modal
+                <Entry
                 onCancel = {closeModalHandler}
                 onConfirm = {closeModalHandler}
                 />)}

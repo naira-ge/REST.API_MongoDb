@@ -9,11 +9,12 @@ const setJWT = (key, value) => {
     return new Promise((resolve, reject) => {
         try {
             return client.set(key, value, (err, res) => {
-        if (err) reject(err);
-        resolve(res);
+                if (err) reject(err);
+
+                resolve(res);
         });
     } catch (error) {
-        reject(error);
+            reject(error);
         }
     });
 };
@@ -23,6 +24,7 @@ const getJWT = (key) => {
         try {
             client.get(key, (err, res) => {
                 if (err) reject(err);
+
                 resolve(res);
             });
     } catch (error) {
