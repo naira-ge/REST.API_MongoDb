@@ -25,7 +25,7 @@ export const PrivateRoute = ({ children, ...rest }) => {
 		!user._id && dispatch(getUserProfile());
 
 		!sessionStorage.getItem("accessJWT") &&
-			localStorage.getItem("crmSite") &&
+			localStorage.getItem("TalentHouse") &&
 			updateAccessJWT();
 
 		if (sessionStorage.getItem("accessJWT") && !isAuth) {

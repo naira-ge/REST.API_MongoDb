@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "username": "Naira ",
-    "email":"nairagezhoyan@gmail.com",
+    "email":"naira@gmail.com",
     "password":"123456"
 }
 
@@ -13,7 +13,7 @@ POST http://localhost:8800/api/users/login
 Content-Type: application/json
 
 {
-    "email":"nairagezhoyan@gmail.com",
+    "email":"naira@gmail.com",
     "password":"123456"
 }
 
